@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.slider.Slider
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,16 +24,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         editText.doOnTextChanged { text, start, before, count ->
-            textView.text =
-                if (text.isNullOrBlank()) ""
-                else "Bill value: $text, tip percentage: ${slider.value.toInt()}%"
+            setTextView()
         }
 
         slider.addOnChangeListener { slider, value, fromUser ->
-            textView.text =
-                if (editText.text.isNullOrBlank()) ""
-                else "Bill value: ${editText.text}, tip percentage: ${slider.value.toInt()}%"
-
+            setTextView()
         }
+    }
+
+    fun setTextView() {
+        textView.text =
+            if (editText.text.isNullOrBlank()) ""
+            else {
+                val tip = editText.text.toString().toDouble() * slider.value.toInt() / 100
+                val xd = BigDecimal(tip).setScale(2, RoundingMode.HALF_EVEN)
+                "Tip amount: $xd"
+            }
+
     }
 }
